@@ -3,3 +3,8 @@ bio
 
 # cache
 __pycache__
+.DS_Store
+
+# dataset
+examples_seed_ccnn
+Preprocessed_EEG
