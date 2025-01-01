@@ -9,17 +9,25 @@ Due ~ 25/02/08
 ## seed_ccnn 실행방법
 
 1. Installation
+
 pip install -r requirements.txt
 
 2. Prepare dataset
-Preprocessed_EEG/
-├── label.mat
-├── readme.txt
-├── 10_20131130.mat
-├── ...
-└── 9_20140704.mat
 
+    Preprocessed_EEG/
+
+    ├── label.mat
+
+    ├── readme.txt
+
+    ├── 10_20131130.mat
+
+    ├── ...
+
+    └── 9_20140704.mat
+  
 3. 실행
+
 python examples_seed_ccnn.py
 
 
