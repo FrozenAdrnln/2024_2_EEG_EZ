@@ -1,35 +1,38 @@
-
 import numpy as np
 import pandas as pd
 import tensorflow as tf
 from cnn import cnn
+
+#from RnnAttention.attention import attention
 
 from channelWiseAttention import  channel_wise_attention
 from DiSAN import directional_attention_with_dense, multi_dimensional_attention
 
 import scipy.io
 from sklearn.model_selection import train_test_split
-
+from sklearn.model_selection import StratifiedKFold
 
 def calMinTimeStep(bulkArr):
     keys = list(bulkArr.keys())
     minTimeStep = len(bulkArr[keys[3]][0])
-    
+
     for i in range(4, len(keys)):
         if minTimeStep > len(bulkArr[keys[i]][0]):
             minTimeStep = len(bulkArr[keys[i]][0])
-    
+
     return minTimeStep
-        
+
 
 def preprocessingEEG(eegArr, minTimeStep):
     res = eegArr[0][:minTimeStep].reshape(1, eegArr[0][:minTimeStep].shape[0])
     for i in range(1, len(eegArr)):
         res = np.append(res, eegArr[i][:minTimeStep].reshape(1, eegArr[i][:minTimeStep].shape[0]), axis=0)
-    
+
     return res
 
+# tensorflow 계산 구조 -> 미리 데이터가 들어갈 자리인 placeholder만 만들어놓고 layer 연산 정의를 해놓은다음 이후에 feed_dict를 통해 데이터를 placeholder에 주입
 
+#the window length of EEG sample
 window_size = 30000 # 샘플링주파수 x 측정시간 = 128hz x 3초 분량을 추출/ SEED 1000hz x 3초
 # the channel of EEG sample, DEAP:32 DREAMER:14, SEED: 62
 n_channel = 62 # channel 62개 사용 (SEED Dataset)
@@ -94,6 +97,7 @@ conv = channel_wise_attention(X_1, 1, window_size, n_channel, weight_decay=0.000
 
 conv_1 = tf.transpose(conv,[0, 3, 2, 1])
 
+print(conv_1.shape)
 
 # CNN layer: 한 층만 사용 (다층으로 사용해볼 수 있지 않을까????)
 conv_1 = cnn_2d.apply_conv2d(conv_1, kernel_height_1st, kernel_width_1st, input_channel_num, conv_channel_num, kernel_stride, train_phase)
@@ -108,11 +112,11 @@ fc_drop = tf.nn.dropout(pool1_flat, keep_prob)   # 과적합 방지
 lstm_in = tf.reshape(fc_drop, [-1, num_timestep, pool_1_shape[1]*pool_1_shape[2]*pool_1_shape[3]])
 cells = []
 for _ in range(2): # 총 2개의 LSTM cell을 생성
-	cell = tf.compat.v1.nn.rnn_cell.BasicLSTMCell(n_hidden_state, forget_bias=1.0, state_is_tuple=True)   # LSTM cell 형성
-	cell = tf.compat.v1.nn.rnn_cell.DropoutWrapper(cell, output_keep_prob=keep_prob)  # 과적합 방지
-	cells.append(cell)
- 
-	
+   cell = tf.compat.v1.nn.rnn_cell.BasicLSTMCell(n_hidden_state, forget_bias=1.0, state_is_tuple=True)   # LSTM cell 형성
+   cell = tf.compat.v1.nn.rnn_cell.DropoutWrapper(cell, output_keep_prob=keep_prob)  # 과적합 방지
+   cells.append(cell)
+
+
 lstm_cell = tf.compat.v1.nn.rnn_cell.MultiRNNCell(cells)   # 다층 LSTM 구조 생성
 
 batch_size = tf.shape(X)[0]
@@ -124,11 +128,11 @@ rnn_op, states = tf.compat.v1.nn.dynamic_rnn(lstm_cell, lstm_in, initial_state=i
 
 #self-attention layer
 with tf.name_scope('Attention_layer'):
-	attention_op = multi_dimensional_attention(rnn_op, 64, scope=None, keep_prob=1., is_train=None, wd=0., activation='elu', tensor_dict=None, name=None)    # LSTM 결과물에 self-attention 적용
+   attention_op = multi_dimensional_attention(rnn_op, 64, scope=None, keep_prob=1., is_train=None, wd=0., activation='elu', tensor_dict=None, name=None)    # LSTM 결과물에 self-attention 적용
 
-	attention_drop = tf.nn.dropout(attention_op, keep_prob)   # 과적합 방지
+   attention_drop = tf.nn.dropout(attention_op, keep_prob)   # 과적합 방지
 
-	y_ = cnn_2d.apply_readout(attention_drop, rnn_op.shape[2], num_labels)   # 완전연결층에 연결
+   y_ = cnn_2d.apply_readout(attention_drop, rnn_op.shape[2], num_labels)   # 완전연결층에 연결
 
 # softmax layer: probability prediction
 y_prob = tf.nn.softmax(y_, name = "y_prob")
@@ -143,8 +147,8 @@ y_pred = tf.argmax(y_prob, 1, name = "y_pred") # 확률이 젤 높은 애의 클
 cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=y_, labels=Y), name = 'loss')
 update_ops = tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.UPDATE_OPS)
 with tf.control_dependencies(update_ops):
-	# set training SGD optimizer
-	optimizer = tf.compat.v1.train.AdamOptimizer(learning_rate).minimize(cost)
+   # set training SGD optimizer
+   optimizer = tf.compat.v1.train.AdamOptimizer(learning_rate).minimize(cost)
 
 # get correctly predicted object
 correct_prediction = tf.equal(tf.argmax(tf.nn.softmax(y_), 1), tf.argmax(Y, 1))
@@ -157,11 +161,12 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32), name = 'accur
 ############################Experiments on database##############################
 
 
-mat_file_name = "C:/Users/SAMSUNG/visual/Preprocessed_EEG/1_20131027.mat"
+mat_file_name = "../dataset/1_20131027.mat"
 mat_file = scipy.io.loadmat(mat_file_name)
 
 mat_keys = list(mat_file.keys())
 minTimeStep = 30000
+print("mat_keys", mat_keys)
 
 x = preprocessingEEG(mat_file[mat_keys[3]], minTimeStep)
 x = x.reshape(1, x.shape[0], x.shape[1])
@@ -173,41 +178,29 @@ for i in range(4, len(mat_keys)):
     newArr = newArr.reshape(1, newArr.shape[0], newArr.shape[1])
     x = np.append(x, newArr, axis=0)
 
-mat_file_name2 = "C:/Users/SAMSUNG/visual/Preprocessed_EEG/2_20140404.mat"
-mat_file2 = scipy.io.loadmat(mat_file_name2)
-mat_keys2 = list(mat_file2.keys())
+file_name_list = ['1_20131030.mat', '1_20131107.mat', '2_20140404.mat', '2_20140413.mat', '2_20140419.mat', '3_20140603.mat', '3_20140611.mat', '3_20140629.mat', '4_20140621.mat', '4_20140702.mat', '4_20140705.mat', '5_20140411.mat', '5_20140418.mat', '5_20140506.mat', '6_20130712.mat', '6_20131016.mat', '6_20131113.mat', '7_20131027.mat', '7_20131030.mat', '7_20131106.mat', '8_20140511.mat', '8_20140514.mat', '8_20140521', '9_20140620.mat', '9_20140627.mat', '9_20140704.mat', '10_20131130.mat', '10_20131204.mat', '10_20131211.mat', '11_20140618.mat', '11_20140625.mat', '11_20140630.mat', '12_20131127.mat', '12_20131201.mat', '12_20131207.mat', '13_20140527.mat', '13_20140603.mat', '13_20140610.mat', '14_20140601.mat', '14_20140615.mat', '14_20140627.mat', '15_20130709.mat', '15_20131016.mat', '15_20131105.mat']
 
-for i in range(3, len(mat_keys2)):
-    newArr = mat_file2[mat_keys2[i]]
+for i in range(len(file_name_list)):
+  cur_mat_file_name = "../dataset/" + file_name_list[i]
+  cur_mat_file = scipy.io.loadmat(cur_mat_file_name)
+  cur_mat_key = list(cur_mat_file.keys())
+
+  for j in range(3, len(cur_mat_key)):
+    newArr = cur_mat_file[cur_mat_key[j]]
     newArr = preprocessingEEG(newArr, minTimeStep)
     newArr = newArr.reshape(1, newArr.shape[0], newArr.shape[1])
     x = np.append(x, newArr, axis=0)
 
-mat_file_name3 = "C:/Users/SAMSUNG/visual/Preprocessed_EEG/3_20140603.mat"
-mat_file3 = scipy.io.loadmat(mat_file_name3)
-mat_keys3 = list(mat_file3.keys())
-
-for i in range(3, len(mat_keys3)):
-    newArr = mat_file3[mat_keys3[i]]
-    newArr = preprocessingEEG(newArr, minTimeStep)
-    newArr = newArr.reshape(1, newArr.shape[0], newArr.shape[1])
-    x = np.append(x, newArr, axis=0)
-
-mat_file_name4 = "C:/Users/SAMSUNG/visual/Preprocessed_EEG/1_20131030.mat"
-mat_file4 = scipy.io.loadmat(mat_file_name4)
-mat_keys4 = list(mat_file4.keys())
-
-for i in range(3, len(mat_keys4)):
-    newArr = mat_file4[mat_keys4[i]]
-    newArr = preprocessingEEG(newArr, minTimeStep)
-    newArr = newArr.reshape(1, newArr.shape[0], newArr.shape[1])
-    x = np.append(x, newArr, axis=0)
 
 x = x.reshape(x.shape[0], x.shape[1], x.shape[2], 1)
 
 x = (x - np.mean(x, axis=1, keepdims=True)) / np.std(x, axis=1, keepdims=True)
 
-labels = [0, 1, 0, 0, 1, 2, 0, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 0, 0, 1, 2, 0, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 0, 0, 1, 2, 0, 1, 2, 2, 1, 0, 1, 2, 0, 0, 1, 0, 0, 1, 2, 0, 1, 2, 2, 1, 0, 1, 2, 0]
+labels = [0, 1, 0, 0, 1, 2, 0, 1, 2, 2, 1, 0, 1, 2, 0]
+
+for i in range(len(file_name_list)):
+  labels += labels
+
 num_unique_label = len(np.unique(labels))
 identity_matrix = np.eye(num_unique_label)
 one_hot_encoded_y = identity_matrix[labels]
@@ -215,14 +208,15 @@ one_hot_encoded_y = identity_matrix[labels]
 X_train, X_test, y_train, y_test = train_test_split(x, one_hot_encoded_y, test_size=0.8)
 
 
-epochs = 1
+epochs = 10
 
 with tf.compat.v1.Session() as sess:
     sess.run(tf.compat.v1.global_variables_initializer())
-    
+
     for epoch in range(epochs):
+        print("epoch", epoch)
         sess.run(optimizer, feed_dict={X: X_train, Y: y_train, train_phase: True, keep_prob: 0.5})
-    
+
     acc = sess.run(accuracy, feed_dict={X: X_test, Y: y_test, train_phase: False, keep_prob: 1.0})
-    
+
     print(acc)
