@@ -37,6 +37,7 @@ dataset = SEEDDataset(io_path='./seed_full_200/seed',
 k = 5
 k_fold = KFoldGroupbyTrial(n_splits=k,
                            split_path='./seed_full_200/split')
+
 bs = 256
 dropout1 = 0.5
 dropout2 = 0.5
