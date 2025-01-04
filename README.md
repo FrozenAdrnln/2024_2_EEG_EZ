@@ -6,6 +6,14 @@ ElectroEncephaloGram을 사용한 Emotion Recognition model 개선 및 성능 �
 
 Due ~ 25/02/08
 
+## ACRNN
+* Channel-wise attention + cnn + lstm + attention
+* tensorflow 구버전과 gpu 사이 연동 이슈로 인해 대용량 데이터를 학습시키에 무리가 있다고 판단 후 보류
+
+## seed_ccnn
+* torcheeg에서 지원하는 Continuous Convolutional Neural Network(CCNN)을 사용
+* EEG의 시간적 관계(시계열)와 공간적 관계(부위별 전극 사이)를 학습
+  
 ## seed_ccnn 실행방법
 
 1. Installation
