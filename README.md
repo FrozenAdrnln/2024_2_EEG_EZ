@@ -10,6 +10,11 @@ Due ~ 25/02/08
 * Channel-wise attention + cnn + lstm + attention
 * tensorflow 구버전과 gpu 사이 연동 이슈로 인해 대용량 데이터를 학습시키에 무리가 있다고 판단 후 보류
 
+## SEED_DEEP
+* torcheeg 사용
+* CNN + LSTM with maxpool, dropout, and residual connections
+* softmax, cross entropy
+
 ## seed_ccnn
 * torcheeg에서 지원하는 Continuous Convolutional Neural Network(CCNN)을 사용
 * EEG의 시간적 관계(시계열)와 공간적 관계(부위별 전극 사이)를 학습
