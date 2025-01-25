@@ -8,6 +8,10 @@ from torcheeg import transforms
 from torcheeg.datasets import SEEDDataset
 from torcheeg.model_selection import KFoldGroupbyTrial
 
+def label_transform_fn(x):
+    return x + 1
+
+
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print("GPU: running on ", device)
 print("This is a minimal script to recreate best results")
@@ -23,32 +27,35 @@ set_seed(42)
 sample = 200
 dataset = SEEDDataset(io_path='./seed_full_200/seed',
                       root_path='./data/Preprocessed_EEG',
+                      num_channel=1,
                       offline_transform=None,
                       online_transform=transforms.Compose([
                           transforms.ToTensor(),
                       ]),
                       label_transform=transforms.Compose([
                           transforms.Select('emotion'),
-                          transforms.Lambda(lambda x: x + 1)
+                          transforms.Lambda(label_transform_fn)
                       ]),
                       chunk_size=sample,
                       num_worker=24)
+
+
 
 k = 5
 k_fold = KFoldGroupbyTrial(n_splits=k,
                            split_path='./seed_full_200/split')
 
 bs = 256
-dropout1 = 0.5
-dropout2 = 0.5
-dropoutc = 0.2
+dropout1 = 0.1
+dropout2 = 0.1
+dropoutc = 0.1
 num_res_layers = 5
-c1 = 50
+c1 = 200
 l1 = 1024
 l2 = 1024
 ll1 = 1024
 ll2 = 768
-epochs = 100
+epochs = 20
 lr = 1e-4
 wd = 1e-4
 do_pool = True
@@ -67,6 +74,8 @@ for i, (train_dataset, val_dataset) in enumerate(k_fold.split(dataset)):
                     ll2=ll2,
                     dropout1=dropout1,
                     dropout2=dropout2)
+
+
 
   # Initialize the trainer and use the 0-th GPU for training
   trainer = Trainer(model=model,
