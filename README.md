@@ -12,7 +12,7 @@ Due ~ 25/02/08
 
 ## SEED_DEEP
 * torcheeg 사용
-* CNN + LSTM with maxpool, dropout, and residual connections
+* CNN (3 layers) + bi-LSTM with maxpool, dropout, and residual connections
 * softmax, cross entropy
 
 ## seed_ccnn
