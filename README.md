@@ -35,7 +35,7 @@ ElectroEncephaloGram을 사용한 Emotion Recognition model 개선 및 성능 �
 ## ⭐Demo Day
 * 2025/02/08 프로메테우스 데모 데이 부스 운영
 * 화제의 넷플릭스 드라마 오징어게임2에서 활약한 캐릭터들의 장면을 보여주고, 체험자가 가장 긍정의 감정을 느낀 캐릭터와 관련된 상품을 증정
-
+![Image](https://github.com/user-attachments/assets/4799129f-64c6-474a-be45-c97041b1e235)
 
 ## 😎Members
 이지은, 조현진, 윤지찬, 최윤서, 윤상민, 심수민
