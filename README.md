@@ -8,7 +8,7 @@ ElectroEncephaloGram을 사용한 Emotion Recognition model 개선 및 성능 �
 
 ## Model 1: CNN-bi-LSTM with Attention
 * CNN과 bi-LSTM 사용 (Pooling layer 제외)
-* Attention 메커니즘 사용용
+* Attention 메커니즘 사용
 
 ## Model 2: CCNN
 * torcheeg를 통해 SEED dataset에서 1개의 channel만 불러옴과 동시에 전처리 진행
