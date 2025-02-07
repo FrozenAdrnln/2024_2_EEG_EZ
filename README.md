@@ -7,6 +7,8 @@ ElectroEncephaloGram을 사용한 Emotion Recognition model 개선 및 성능 �
 * 보유하고 있는 뇌파 측정기의 channel이 1개인 이슈로 인해 62개의 channel을 사용해 측정한 SEED dataset에서 1개의 channel만 추출하고 전처리
 
 ## Model 1: CNN-bi-LSTM with Attention
+* CNN과 bi-LSTM 사용 (Pooling layer 제외)
+* Attention 메커니즘 사용
 
 ## Model 2: CCNN
 * torcheeg를 통해 SEED dataset에서 1개의 channel만 불러옴과 동시에 전처리 진행
