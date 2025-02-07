@@ -1,4 +1,4 @@
-# 2024_2 프로메테우스 EEG 프로젝트팀 
+# 🔥2024_2 프로메테우스 EEG 프로젝트팀 
 
 ElectroEncephaloGram을 사용한 Emotion Recognition model 개선 및 성능 비교 프로젝트
 
