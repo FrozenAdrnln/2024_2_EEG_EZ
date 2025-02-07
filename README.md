@@ -38,4 +38,7 @@ ElectroEncephaloGram을 사용한 Emotion Recognition model 개선 및 성능 �
 ![Image](https://github.com/user-attachments/assets/4799129f-64c6-474a-be45-c97041b1e235)
 
 ## 😎Members
-이지은, 조현진, 윤지찬, 최윤서, 윤상민, 심수민
+| 심수민 (개발)      | 윤상민 (개발)     | 이지은 (팀장, 개발)     | 이지은 (팀장, 개발)     |
+|:----------:|:------------------------------:|:------------------------------------:||:------------------------------------:|
+| ![Alice 사진](https://via.placeholder.com/100)      | ![Alice 사진](https://via.placeholder.com/100) | ![Alice 사진](https://via.placeholder.com/100) | ![Alice 사진](https://via.placeholder.com/100) |
+| [use08174](https://github.com/use08174)        |  [jyhannakim](https://github.com/jyhannakim)  |  [yeonu2](https://github.com/yeonu2)    | [yeonu2](https://github.com/yeonu2)    |
