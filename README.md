@@ -4,10 +4,12 @@ ElectroEncephaloGram을 사용한 Emotion Recognition model 개선 및 성능 �
 
 ## 🤔Overview
 * 기존 시계열 데이터 학습에 많이 쓰이는 다양한 모델에 뇌파 데이터를 학습 시켜 현재 그 사람이 어떤 감정을 느끼고 있는 지 판단 -> 성능 비교
+* 감정은 긍정, 중립, 부정으로 label을 나눔
 
 ## 📑Training Dataset
 * SEED dataset 사용
 * 보유하고 있는 뇌파 측정기의 channel이 1개인 이슈로 인해 62개의 channel을 사용해 측정한 SEED dataset에서 1개의 channel만 추출하고 전처리
+* torcheeg의 SEEDDataset 함수를 통해 학습용 SEED data 전처리
 
 ## 🧠Model 1: CNN-bi-LSTM with Attention
 * torcheeg를 통해 SEED dataset에서 1개의 channel만 불러옴과 동시에 전처리 진행
@@ -29,6 +31,11 @@ ElectroEncephaloGram을 사용한 Emotion Recognition model 개선 및 성능 �
 * ResNet-34로 공간적 특징을 추출 
 * BiLSTM으로 시계열 패턴을 학습 
 * Attention 메커니즘으로 중요정보를 강조하는 신경망 모델
+
+## ⭐Demo Day
+* 2025/02/08 프로메테우스 데모 데이 부스 운영
+* 화제의 넷플릭스 드라마 오징어게임2에서 활약한 캐릭터들의 장면을 보여주고, 체험자가 가장 긍정의 감정을 느낀 캐릭터와 관련된 상품을 증정
+
 
 ## 😎Members
 이지은, 조현진, 윤지찬, 최윤서, 윤상민, 심수민
