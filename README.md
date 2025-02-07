@@ -2,7 +2,7 @@
 
 ElectroEncephaloGram을 사용한 Emotion Recognition model 개선 및 성능 비교 프로젝트
 
-## Training Dataset
+## 📑Training Dataset
 * SEED dataset 사용
 * 보유하고 있는 뇌파 측정기의 channel이 1개인 이슈로 인해 62개의 channel을 사용해 측정한 SEED dataset에서 1개의 channel만 추출하고 전처리
 
@@ -27,5 +27,5 @@ ElectroEncephaloGram을 사용한 Emotion Recognition model 개선 및 성능 �
 * BiLSTM으로 시계열 패턴을 학습 
 * Attention 메커니즘으로 중요정보를 강조하는 신경망 모델
 
-## Members
+## 😎Members
 이지은, 조현진, 윤지찬, 최윤서, 윤상민, 심수민
